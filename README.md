@@ -2,6 +2,11 @@
 
 Build, deploy, and automate a credit risk probability model using alternative data (Xente transactions). This README stays project-specific. Reusable guides live in `docs/`.
 
+## Credit Scoring Business Understanding
+- Basel II alignment: The Accord demands measurable, auditable risk models, so we favor interpretable transformations (e.g., WoE bins) with documented assumptions, versioned data pipelines, and clear mappings from probability of default (PD) to credit score. Every model choice must be explainable to risk, audit, and regulators.
+- Why a proxy target: We do not have an observed default label, so we derive `is_high_risk` from RFM-based disengagement. This enables supervised learning but introduces label noise; predictions may mirror engagement rather than true default risk. Mitigations: transparently document the proxy, monitor drift, refresh labels as real outcomes arrive, and keep cut-offs conservative.
+- Model trade-offs: Simple models (Logistic with WoE) are transparent, easier to validate, and cheaper to monitor; they support monotonicity and policy overrides. Complex models (Gradient Boosting/Random Forest) can lift AUC/recall and capture non-linearities but raise governance cost (explainability tooling, fairness checks), risk of overfitting to the proxy, and operational complexity. In a regulated setting, start with the simple baseline, then justify any complex upgrade with clear lift and explainability evidence.
+
 ## Project Overview
 - Goal: Estimate risk probability per customer; derive a credit score and inform loan amount/duration.
 - Proxy Target: RFM-based disengagement to label `is_high_risk` in absence of explicit defaults.
@@ -36,17 +41,6 @@ pytest -q
   - Folder structure and conventions: [docs/README.md](docs/README.md)
   - Notebooks workflow: [docs/notebooks.md](docs/notebooks.md)
   - Dependencies overview: [docs/dependencies.md](docs/dependencies.md)
-
-Inline previews (for platforms that support HTML rendering):
-<details>
-<summary>View Folder Structure</summary>
-<iframe src="docs/README.md#folder-structure" title="Folder Structure" style="width:100%;height:360px;border:1px solid #ddd;"></iframe>
-</details>
-
-<details>
-<summary>View How to Run (High Level)</summary>
-<iframe src="docs/README.md#how-to-run-high-level" title="How to Run" style="width:100%;height:260px;border:1px solid #ddd;"></iframe>
-</details>
 
 ## Deliverables
 - Interim: EDA notebook with 3–5 insights; summary report.

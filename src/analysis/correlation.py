@@ -1,7 +1,7 @@
 """
 Correlation Analysis Module
 
-Statistical correlation tests between sentiment and stock returns.
+Statistical correlation helpers that operate on any two numeric series.
 """
 
 import pandas as pd
@@ -10,84 +10,56 @@ from scipy.stats import pearsonr, spearmanr
 from typing import Dict, Tuple
 
 
-def calculate_pearson_correlation(sentiment: pd.Series, returns: pd.Series) -> Dict[str, float]:
-    """
-    Calculate Pearson correlation coefficient with p-value.
+def calculate_pearson_correlation(x: pd.Series, y: pd.Series, alpha: float = 0.05) -> Dict[str, float]:
+    """Calculate Pearson correlation coefficient with p-value for any two series."""
+
+    valid_idx = ~(x.isna() | y.isna())
+    x_clean = x[valid_idx]
+    y_clean = y[valid_idx]
     
-    Args:
-        sentiment: Series of sentiment scores
-        returns: Series of stock returns
-        
-    Returns:
-        Dictionary with correlation, p_value, and significance flag
-    """
-    # Remove NaN values
-    valid_idx = ~(sentiment.isna() | returns.isna())
-    sent_clean = sentiment[valid_idx]
-    ret_clean = returns[valid_idx]
-    
-    if len(sent_clean) < 3:
+    if len(x_clean) < 3:
         return {'correlation': 0.0, 'p_value': 1.0, 'significant': False, 'n_samples': 0}
     
-    corr, p_value = pearsonr(sent_clean, ret_clean)
+    corr, p_value = pearsonr(x_clean, y_clean)
     
     return {
         'correlation': corr,
         'p_value': p_value,
-        'significant': p_value < 0.05,
-        'n_samples': len(sent_clean)
+        'significant': p_value < alpha,
+        'n_samples': len(x_clean)
     }
 
 
-def calculate_spearman_correlation(sentiment: pd.Series, returns: pd.Series) -> Dict[str, float]:
-    """
-    Calculate Spearman rank correlation (non-parametric).
+def calculate_spearman_correlation(x: pd.Series, y: pd.Series, alpha: float = 0.05) -> Dict[str, float]:
+    """Calculate Spearman rank correlation (non-parametric) for any two series."""
+
+    valid_idx = ~(x.isna() | y.isna())
+    x_clean = x[valid_idx]
+    y_clean = y[valid_idx]
     
-    Args:
-        sentiment: Series of sentiment scores
-        returns: Series of stock returns
-        
-    Returns:
-        Dictionary with correlation, p_value, and significance
-    """
-    valid_idx = ~(sentiment.isna() | returns.isna())
-    sent_clean = sentiment[valid_idx]
-    ret_clean = returns[valid_idx]
-    
-    if len(sent_clean) < 3:
+    if len(x_clean) < 3:
         return {'correlation': 0.0, 'p_value': 1.0, 'significant': False}
     
-    corr, p_value = spearmanr(sent_clean, ret_clean)
+    corr, p_value = spearmanr(x_clean, y_clean)
     
     return {
         'correlation': corr,
         'p_value': p_value,
-        'significant': p_value < 0.05
+        'significant': p_value < alpha
     }
 
 
-def calculate_lagged_correlation(sentiment: pd.Series, returns: pd.Series,
-                                 max_lag: int = 5) -> pd.DataFrame:
-    """
-    Test correlation with time lags (news impact delay).
-    
-    Args:
-        sentiment: Series of sentiment scores
-        returns: Series of stock returns
-        max_lag: Maximum number of days to lag (default 5)
-        
-    Returns:
-        DataFrame with lag, correlation, and p_value
-    """
+def calculate_lagged_correlation(x: pd.Series, y: pd.Series, max_lag: int = 5, alpha: float = 0.05) -> pd.DataFrame:
+    """Test correlation with time lags between two series (x leading y)."""
     results = []
     
     for lag in range(max_lag + 1):
         if lag == 0:
-            lagged_returns = returns
+            lagged_y = y
         else:
-            lagged_returns = returns.shift(-lag)
+            lagged_y = y.shift(-lag)
         
-        corr_result = calculate_pearson_correlation(sentiment, lagged_returns)
+        corr_result = calculate_pearson_correlation(x, lagged_y, alpha=alpha)
         corr_result['lag'] = lag
         results.append(corr_result)
     
@@ -96,17 +68,7 @@ def calculate_lagged_correlation(sentiment: pd.Series, returns: pd.Series,
 
 
 def test_correlation_significance(correlation: float, n: int, alpha: float = 0.05) -> bool:
-    """
-    Test if correlation is statistically significant.
-    
-    Args:
-        correlation: Correlation coefficient
-        n: Sample size
-        alpha: Significance level (default 0.05)
-        
-    Returns:
-        True if significant, False otherwise
-    """
+    """Test if correlation is statistically significant for any two-series test."""
     if n < 3:
         return False
     
@@ -120,18 +82,7 @@ def test_correlation_significance(correlation: float, n: int, alpha: float = 0.0
     return abs(t_stat) > critical_value
 
 
-def calculate_rolling_correlation(sentiment: pd.Series, returns: pd.Series,
-                                  window: int = 30) -> pd.Series:
-    """
-    Calculate rolling correlation over time.
-    
-    Args:
-        sentiment: Series of sentiment scores
-        returns: Series of stock returns
-        window: Rolling window size (default 30 days)
-        
-    Returns:
-        Series of rolling correlations
-    """
-    rolling_corr = sentiment.rolling(window).corr(returns)
+def calculate_rolling_correlation(x: pd.Series, y: pd.Series, window: int = 30) -> pd.Series:
+    """Calculate rolling correlation over time for any two aligned series."""
+    rolling_corr = x.rolling(window).corr(y)
     return rolling_corr

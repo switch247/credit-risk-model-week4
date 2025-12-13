@@ -84,3 +84,24 @@ class Plotter:
         sns.boxplot(data=df, x=x, y=y)
         plt.xticks(rotation=45)
         self._finalize(title or f"Distribution of {y}", xlabel or (x if x else ""), ylabel or y)
+
+    def plot_heatmap(self, corr_mat: pd.DataFrame, title: str | None = None, cmap: str = "coolwarm",
+                     center: Optional[float] = 0, square: bool = True, annot: bool = False,
+                     figsize: tuple = (8, 6)):
+        """Plot and save a correlation-style heatmap from a square DataFrame.
+
+        Parameters
+        - corr_mat: square DataFrame of pairwise values (e.g., correlations)
+        - title: optional title used for display and filename
+        - cmap, center, square, annot: forwarded to seaborn.heatmap
+        - figsize: matplotlib figure size tuple
+        """
+        if corr_mat is None or corr_mat.empty:
+            print("No matrix provided for heatmap.")
+            return
+
+        plt.figure(figsize=figsize)
+        sns.heatmap(corr_mat, cmap=cmap, center=center, square=square, annot=annot)
+        # rotate x tick labels if long
+        plt.xticks(rotation=45)
+        self._finalize(title or "Correlation Heatmap", None, None)

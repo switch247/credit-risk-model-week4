@@ -11,12 +11,15 @@ except Exception:
 	PlayStoreScraper = None
 
 try:
-	from ..preprocessing.preprocessor import ReviewPreprocessor
+	from ..preprocessing.preprocessor import DatasetPreprocessor
 except Exception:
-	ReviewPreprocessor = None
+	DatasetPreprocessor = None
+
+# Backwards compatibility alias
+ReviewPreprocessor = DatasetPreprocessor
 
 try:
-	from ..preprocessing.data_loader import DatabaseLoader
+	from .data_base_loader import DatabaseLoader
 except Exception:
 	DatabaseLoader = None
 

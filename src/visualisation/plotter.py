@@ -6,6 +6,8 @@ import re
 from pathlib import Path
 from typing import Optional
 
+import pandas as pd
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -49,10 +51,17 @@ class Plotter:
         plt.show()
         plt.close()
 
-    def plot_histogram(self, df, column, title=None, xlabel=None, ylabel="Count", bins=20):
-        """Plot and save a histogram with KDE."""
+    def plot_histogram(self, df, column, title=None, xlabel=None, ylabel="Count", bins=20, log_scale=False):
+        """Plot and save a histogram with KDE; coerces to numeric and drops NaNs."""
+        series = pd.to_numeric(df[column], errors="coerce").dropna()
+        if series.empty:
+            print(f"No numeric data available to plot for column '{column}'.")
+            return
+
         plt.figure()
-        sns.histplot(data=df, x=column, bins=bins, kde=True)
+        sns.histplot(series, bins=bins, kde=True)
+        if log_scale:
+            plt.xscale("symlog")
         self._finalize(title or f"Distribution of {column}", xlabel or column, ylabel)
 
     def plot_bar(self, df, x, y, title=None, xlabel=None, ylabel=None):

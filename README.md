@@ -28,6 +28,66 @@ dvc repro
 # run unit tests
 pytest -q
 ```
+ 
+## Environment Setup
+
+- Prerequisites: Python 3.11+, Docker, and Docker Compose.
+- Database (Postgres via Docker Compose):
+  - Start the database container:
+    ```powershell
+    docker compose up -d postgres
+    ```
+  - Connection: host `localhost`, port `5443`, user `postgres`, password `root`, db `customer_fintec`.
+
+## Run With Docker
+
+- Build the application image:
+  ```powershell
+  docker build -t credit-risk-app:latest .
+  ```
+
+- Run scripts inside the container (mounted workspace):
+  ```powershell
+  docker run --rm -it \
+    --name credit-risk-run \
+    --network host \
+    -v ${PWD}:/app \
+    credit-risk-app:latest \
+    python scripts/build_features.py
+  ```
+
+> Tip: On Windows, containers can reach host services via `host.docker.internal`. With Compose, Postgres already maps `5443:5432`.
+
+## End-to-End: Pipelines
+
+From a fresh clone, a common sequence is:
+
+1. Bring up Postgres:
+   ```powershell
+   docker compose up -d postgres
+   ```
+2. Apply schema/migrations:
+   ```powershell
+   python scripts/run_migrations.py
+   ```
+3. Build features:
+   ```powershell
+   python scripts/build_features.py
+   ```
+4. Generate insights and reports:
+   ```powershell
+   python scripts/generate_insights.py
+   ```
+
+Optional:
+- Check processed dataset:
+  ```powershell
+  python scripts/check_processed_df.py
+  ```
+- Train sentiment model:
+  ```powershell
+  python scripts/train_sentiment_analysis_model.py
+  ```
 
 ## Data & Features (project-specific)
 - Source: Xente Challenge transactions (see links in `experiments/todo.md`).

@@ -70,11 +70,15 @@ From a fresh clone, a common sequence is:
    ```powershell
    python scripts/run_migrations.py
    ```
-3. Build features:
+3. Build features (Task 3):
    ```powershell
    python scripts/build_features.py
    ```
-4. Generate insights and reports:
+4. Create credit risk target (Task 4):
+   ```powershell
+   python scripts/create_credit_risk_target.py
+   ```
+5. Generate insights and reports:
    ```powershell
    python scripts/generate_insights.py
    ```

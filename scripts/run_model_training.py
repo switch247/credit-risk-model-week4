@@ -33,9 +33,14 @@ def main():
     
     # 3. Build Feature Pipeline
     print("Building feature pipeline...")
+    # Define categorical columns excluding the target 'FraudResult'
+    categorical_cols = [
+        'CurrencyCode', 'CountryCode', 'ProviderId', 'ProductId', 'ProductCategory', 'ChannelId',
+        'PricingStrategy'
+    ]
+    
     # We need to identify categorical and numerical columns if we want to override defaults
-    # But build_feature_pipeline has defaults for Xente data
-    feat_pipe, _ = build_feature_pipeline()
+    feat_pipe, _ = build_feature_pipeline(categorical_cols=categorical_cols)
     
     # 4. Build Models
     print("Building models...")

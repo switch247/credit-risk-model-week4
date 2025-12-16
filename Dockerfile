@@ -4,8 +4,7 @@ FROM python:3.11-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    POETRY_VIRTUALENVS_CREATE=false
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
@@ -17,6 +16,22 @@ RUN apt-get update \
        git \
        libpq-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Install python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+# Copy application code
+COPY src/ src/
+COPY scripts/ scripts/
+# Copy mlruns for model loading (in a real scenario, use a remote tracking server)
+COPY mlruns/ mlruns/
+
+# Expose port
+EXPOSE 8000
+
+# Run the application
+CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # Create a non-root user
 RUN adduser --disabled-password --gecos "" appuser \

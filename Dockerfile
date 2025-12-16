@@ -24,8 +24,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy application code
 COPY src/ src/
 COPY scripts/ scripts/
-# Copy mlruns for model loading (in a real scenario, use a remote tracking server)
-COPY mlruns/ mlruns/
+# Copy fallback model
+COPY outputs/models/ outputs/models/
 
 # Expose port
 EXPOSE 8000

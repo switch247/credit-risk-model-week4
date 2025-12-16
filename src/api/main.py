@@ -1,5 +1,6 @@
 import pandas as pd
 import mlflow.sklearn
+import joblib
 from fastapi import FastAPI, HTTPException
 from src.api.pydantic_models import TransactionInput, PredictionOutput
 import sys
@@ -26,13 +27,20 @@ model = None
 def load_model():
     global model
     try:
-        print(f"Loading model from {model_uri}...")
+        print(f"Attempting to load model from {model_uri}...")
         model = mlflow.sklearn.load_model(model_uri)
-        print("Model loaded successfully.")
+        print("Model loaded successfully from MLflow.")
     except Exception as e:
-        print(f"Error loading model: {e}")
-        # In production, we might want to fail startup, but for dev log it
-        pass
+        print(f"Failed to load from MLflow: {e}")
+        fallback_path = project_root / "outputs" / "models" / "model.pkl"
+        print(f"Attempting fallback load from {fallback_path}...")
+        try:
+            model = joblib.load(fallback_path)
+            print("Model loaded successfully from fallback path.")
+        except Exception as e2:
+            print(f"Error loading model from fallback: {e2}")
+            # In production, we might want to fail startup, but for dev log it
+            pass
 
 
 @app.get("/")

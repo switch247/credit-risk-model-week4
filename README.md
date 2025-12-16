@@ -78,20 +78,7 @@ From a fresh clone, a common sequence is:
    ```powershell
    python scripts/create_credit_risk_target.py
    ```
-5. Generate insights and reports:
-   ```powershell
-   python scripts/generate_insights.py
-   ```
-
-Optional:
-- Check processed dataset:
-  ```powershell
-  python scripts/check_processed_df.py
-  ```
-- Train sentiment model:
-  ```powershell
-  python scripts/train_sentiment_analysis_model.py
-  ```
+```
 
 ## Data & Features (project-specific)
 - Source: Xente Challenge transactions (see links in `experiments/todo.md`).
@@ -125,3 +112,36 @@ Optional:
 ## Notes
 - Prefer interpretable baselines for governance; add explainability to complex models (SHAP) if chosen.
 - Monitor proxy validity; document thresholds and refresh cadence.
+## Model Training & Evaluation (Task 5)
+
+We implemented a structured model training pipeline using **MLflow** for experiment tracking and model registry. The pipeline trains multiple classifiers to detect fraud (FraudResult) and selects the best one based on the **F1 Score**.
+
+### Run the Training Pipeline
+```powershell
+python scripts/run_model_training.py
+```
+
+### Experiment Results
+The following models were trained and evaluated on the Xente dataset:
+
+| Model | Accuracy | Precision | Recall | F1 Score | ROC-AUC |
+|-------|----------|-----------|--------|----------|---------|
+| **Logistic Regression** | 99.85% | 0.77 | 0.28 | 0.41 | 0.997 |
+| **Decision Tree** | 99.95% | 0.85 | 0.92 | 0.88 | 0.986 |
+| **Random Forest** | **99.98%** | **0.94** | **0.94** | **0.94** | **1.000** |
+| **Gradient Boosting** | 99.94% | 0.93 | 0.75 | 0.83 | 0.806 |
+
+### Best Model
+The **Random Forest Classifier** achieved the highest performance with an F1 Score of **0.94** and perfect ROC-AUC. It has been registered in the MLflow Model Registry as:
+- **Name:** Credit_Risk_Fraud_Detection_best_model
+- **Version:** 1
+
+### Tracking
+To view detailed metrics, parameters, and artifacts, start the MLflow UI:
+```powershell
+mlflow ui
+```
+Then navigate to [http://localhost:5000](http://localhost:5000).
+
+![MLflow Dashboard](docs/mlflow_dashboard.png)
+

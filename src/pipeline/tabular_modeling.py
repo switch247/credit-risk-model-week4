@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingClassifier, GradientBoostingRegressor, RandomForestClassifier, RandomForestRegressor
+from sklearn.tree import DecisionTreeClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.metrics import (
@@ -137,6 +138,15 @@ def build_classification_models(preprocessor: ColumnTransformer, random_state: i
                 (
                     "model",
                     LogisticRegression(max_iter=1000, n_jobs=-1),
+                ),
+            ]
+        ),
+        "decision_tree": Pipeline(
+            steps=[
+                ("prep", preprocessor),
+                (
+                    "model",
+                    DecisionTreeClassifier(random_state=random_state),
                 ),
             ]
         ),

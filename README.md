@@ -78,6 +78,51 @@ From a fresh clone, a common sequence is:
    ```powershell
    python scripts/create_credit_risk_target.py
    ```
+
+## API Serving
+
+The project includes a FastAPI application to serve the trained model.
+
+### Run Locally
+
+Start the API server using Uvicorn:
+
+```powershell
+uvicorn src.api.main:app --reload
+```
+
+The API will be available at `http://127.0.0.1:8000`. You can access the interactive documentation at `http://127.0.0.1:8000/docs`.
+
+### Run with Docker
+
+Start the API service using Docker Compose:
+
+```powershell
+docker compose up --build api
+```
+
+### Example Request
+
+Send a POST request to `/predict`:
+
+```json
+{
+  "TransactionId": "TransactionId_1",
+  "BatchId": "BatchId_1",
+  "AccountId": "AccountId_1",
+  "SubscriptionId": "SubscriptionId_1",
+  "CustomerId": "CustomerId_1",
+  "CurrencyCode": "UGX",
+  "CountryCode": 256,
+  "ProviderId": "ProviderId_1",
+  "ProductId": "ProductId_1",
+  "ProductCategory": "airtime",
+  "ChannelId": "ChannelId_1",
+  "Amount": 1000.0,
+  "Value": 1000,
+  "TransactionStartTime": "2018-11-15T02:18:49Z",
+  "PricingStrategy": 2
+}
 ```
 
 ## Data & Features (project-specific)
